@@ -42,8 +42,8 @@ var update = function() {
 };
 
 var next = function() {
+	localStorage[QUEUE_KEY] = queue.join();
     if (queue.length > 0) {
-		localStorage[QUEUE_KEY] = queue.join();
         init_questions(queue.pop());
     } else {
 		var divs = document.body.getElementsByClassName('video_option');
