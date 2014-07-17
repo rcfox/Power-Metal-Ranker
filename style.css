@@ -32,3 +32,8 @@ input#clear_results {
 	top: 0;
 	right: 0;
 }
+
+p.info {
+	padding-top: 1em;
+	clear: both;
+}
