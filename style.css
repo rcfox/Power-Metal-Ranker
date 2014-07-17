@@ -1,0 +1,34 @@
+iframe.youtube {
+	display: block;
+	width: 100%;
+}
+
+div.video_option {
+	width: 30%;
+	float: left;
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+div.video_option input {
+	width: 100%;
+	height: 10%;
+}
+
+div#results {
+	width: 30%;
+}
+
+div#done {
+	display: none;
+}
+
+div#results {
+	float: right;
+}
+
+input#clear_results {
+	position: absolute;
+	top: 0;
+	right: 0;
+}

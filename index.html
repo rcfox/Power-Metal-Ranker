@@ -1,0 +1,30 @@
+<html>
+  <head>
+	<link href="style.css" rel="stylesheet" type="text/css"></link>
+	<script src="https://www.youtube.com/iframe_api"></script>
+	<script type="text/javascript" src="ranker.js"></script>
+	<script src="http://www.reddit.com/r/powermetal/.json?jsonp=parse_reddit"></script>
+  </head>
+  <body onload="update()">
+	<h1>Which is better?</h1>
+	
+	<div id="results"></div>
+
+	<div class="video_option">
+	  <div id="player1" class="youtube"></div>
+	  <input type="button" id="choose_a" onclick="choose_a()"></input>
+	</div>
+
+	<div class="video_option">
+	  <div id="player2" class="youtube"></div>
+	  <input type="button" id="choose_b" onclick="choose_b()"></input>
+	</div>
+
+	<div id="done">
+	  <h2>You're done!</h2>
+	  <p>There are no more videos left to compare. Check back again later.</p>
+	</div>
+
+	<input type="button" id="clear_results" value="Clear Results" onclick="clear_results()"></input>
+  </body>
+</html>
