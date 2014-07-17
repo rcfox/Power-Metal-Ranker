@@ -1,9 +1,10 @@
+<!DOCTYPE html>
 <html>
   <head>
-	<link href="style.css" rel="stylesheet" type="text/css"></link>
-	<script src="https://www.youtube.com/iframe_api"></script>
+	<link href="style.css" rel="stylesheet" type="text/css">
+	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
 	<script type="text/javascript" src="ranker.js"></script>
-	<script src="http://www.reddit.com/r/powermetal/.json?jsonp=parse_reddit&limit=100"></script>
+	<script type="text/javascript" src="http://www.reddit.com/r/powermetal/.json?jsonp=parse_reddit&amp;limit=100"></script>
 	<title>Power Metal Ranker</title>
   </head>
   <body onload="update()">
@@ -13,12 +14,12 @@
 
 	<div class="video_option">
 	  <div id="player1" class="youtube"></div>
-	  <input type="button" id="choose_a" onclick="choose_a()"></input>
+	  <input type="button" id="choose_a" onclick="choose_a()" value="Choice A" />
 	</div>
 
 	<div class="video_option">
 	  <div id="player2" class="youtube"></div>
-	  <input type="button" id="choose_b" onclick="choose_b()"></input>
+	  <input type="button" id="choose_b" onclick="choose_b()" value="Choice B" />
 	</div>
 
 	<div id="done">
@@ -30,6 +31,6 @@
 	  All links are pulled from <a target="_blank" href="http://www.reddit.com/r/PowerMetal">/r/PowerMetal</a> on Reddit.
 	</p>
 	
-	<input type="button" id="clear_results" value="Clear Results" onclick="clear_results()"></input>
+	<input type="button" id="clear_results" value="Clear Results" onclick="clear_results()" />
   </body>
 </html>
