@@ -43,8 +43,8 @@ var update = function() {
 
 var next = function() {
     if (queue.length > 0) {
-        init_questions(queue.pop());
 		localStorage[QUEUE_KEY] = queue.join();
+        init_questions(queue.pop());
     } else {
 		var divs = document.body.getElementsByClassName('video_option');
 		for (var i = 0; i < divs.length; i++) {
