@@ -37,3 +37,7 @@ p.info {
 	padding-top: 1em;
 	clear: both;
 }
+
+p {
+	margin-left: 1em;
+}

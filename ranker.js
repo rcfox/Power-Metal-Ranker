@@ -80,9 +80,11 @@ var init_questions = function(value) {
     ask_question();
 };
 
-var ask_question = function() {
+var ask_question = function() {	
+	var comparisons_left = Math.floor(Math.log(top_index - bot_index + 1) / Math.log(2));
     var test_val = results[mid_index];
     var question = document.getElementById('question');
+	document.getElementById('comparison_counter').innerHTML = comparisons_left + 1;
     document.getElementById('choose_a').value = localStorage[title_key(current_value)];
     document.getElementById('choose_b').value = localStorage[title_key(test_val)];
     play_video('player1', current_value);
