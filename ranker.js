@@ -9,6 +9,8 @@ var bot_index = 0;
 var players = {};
 var players_last = {};
 
+var YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
+
 var RESULTS_KEY = '/results';
 var QUEUE_KEY = '/queue';
 var TITLE_KEY_PREFIX = '/title/';
@@ -132,10 +134,10 @@ var parse_reddit = function(data) {
 	queue = queue.concat(new_queue);
     new_queue.forEach(function(x) {
 		if (!localStorage[title_key(x)]) {
-			var script = document.createElement('script');
-			script.src = 'http://gdata.youtube.com/feeds/api/videos/' + x +
-				'?v=2&alt=json-in-script&callback=get_youtube_title';
-			document.head.appendChild(script);
+		    var script = document.createElement('script');
+		    script.src = 'https://www.googleapis.com/youtube/v3/videos?part=snippet&id=' + x +
+			'&fields=items(id%2Csnippet)&callback=get_youtube_title&key=' + YOUTUBE_API_KEY
+		    document.head.appendChild(script);
 		}
 		localStorage[visited_key(x)] = 'true';
     });
@@ -143,8 +145,12 @@ var parse_reddit = function(data) {
 };
 
 var get_youtube_title = function(data) {
-    var id = data['entry']['media$group']['yt$videoid']['$t'];
-    var title = data['entry']['title']['$t'];
+    if (data['error']) {
+	alert('An error occurred trying to access the YouTube API:\n\n' + data['error']['message']);
+	get_youtube_title = function(data) {}; // Prevent alert spam.
+    }
+    var id = data['items'][0]['id'];
+    var title = data['items'][0]['snippet']['title'];
     localStorage[title_key(id)] = title;
 };
 
