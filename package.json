@@ -1,0 +1,30 @@
+{
+  "name": "binary-search-ranker",
+  "version": "1.0.0",
+  "description": "Rank YouTube videos (mostly meant for music) using binary search.",
+  "main": "ranker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rcfox/Power-Metal-Ranker.git"
+  },
+  "keywords": [
+    "ranking",
+    "music",
+    "youtube"
+  ],
+  "author": "Ryan Fox",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/rcfox/Power-Metal-Ranker/issues"
+  },
+  "homepage": "https://github.com/rcfox/Power-Metal-Ranker#readme",
+  "devDependencies": {
+    "babel-core": "^6.17.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.16.0",
+    "webpack": "^1.13.2"
+  }
+}
