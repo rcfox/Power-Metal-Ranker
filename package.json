@@ -32,6 +32,7 @@
     "webpack-dev-server": "^1.16.1"
   },
   "dependencies": {
+    "binary-search-promises": "^1.0.0",
     "fetch-reddit": "^0.1.0"
   }
 }

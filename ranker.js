@@ -1,4 +1,5 @@
 import {fetchPosts} from 'fetch-reddit';
+import binarySearch from 'binary-search-promises';
 
 var queue = [];
 var results = [];
@@ -42,7 +43,7 @@ var update = function() {
     });
     div.appendChild(ul);
 
-    next();
+    //next();
 };
 
 var next = function() {
@@ -203,11 +204,38 @@ var clear_results = function() {
 };
 
 const init = function() {
+    let buttonA = document.getElementById('choose_a');
+    let buttonB = document.getElementById('choose_b');
+    let results = [];
+
+    const compareSongs = function() {
+        let next = queue.pop();
+        localStorage[QUEUE_KEY] = queue.join();
+        binarySearch(results, next, function(a, b) {
+            play_video('player1', a);
+            play_video('player2', b);
+            buttonA.value = localStorage[title_key(a)];
+            buttonB.value = localStorage[title_key(b)];
+            return Promise.race([
+                new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
+                new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
+            ]);
+        }).then(resolution => {
+           let [found, position] = resolution;
+           results.splice(position, 0, next);
+           localStorage[RESULTS_KEY] = results.join();
+           update();
+           compareSongs();
+        });
+    }
+
+    if (localStorage[RESULTS_KEY]) {
+        results = localStorage[RESULTS_KEY].split(',');
+    }
+
     fetchPosts('/r/PowerMetal/')
     .then(data => parse_reddit(data.posts))
-    .then(() => {
-
-    })
+    .then(compareSongs)
     .catch(console.error);
 };
 init();
