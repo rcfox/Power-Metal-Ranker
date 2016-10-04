@@ -1,15 +1,15 @@
 import {fetchPosts} from 'fetch-reddit';
 import binarySearch from 'binary-search-promises';
 
-var queue = [];
+import {List, Queue} from './storageContainers.js'
+const queue = new Queue('/queue');
+const results = new List('/results');
 
 var players = {};
 var players_last = {};
 
 var YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
-var RESULTS_KEY = '/results';
-var QUEUE_KEY = '/queue';
 var TITLE_KEY_PREFIX = '/title/';
 var VISITED_KEY_PREFIX = '/visited/';
 var title_key = function(id) {
@@ -25,34 +25,25 @@ var update = function() {
         div.removeChild(div.firstChild);
     }
     var ul = document.createElement('ol');
-    var results = [];
-    if (localStorage[RESULTS_KEY]) {
-        results = localStorage[RESULTS_KEY].split(',');
-    }
-    results.slice().reverse().forEach(function(x) {
-        var li = document.createElement('li');
-        var a = document.createElement('a');
-        a.href = 'https://www.youtube.com/watch?v=' + x;
-        a.target = '_blank';
-        a.innerHTML = localStorage[title_key(x)];
-        li.appendChild(a);
-        ul.appendChild(li);
+    results.to_array().then(array => {
+        array.reverse().forEach(x => {
+            var li = document.createElement('li');
+            var a = document.createElement('a');
+            a.href = 'https://www.youtube.com/watch?v=' + x;
+            a.target = '_blank';
+            a.innerHTML = localStorage[title_key(x)];
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
     });
     div.appendChild(ul);
 };
 
 var parse_reddit = function(posts) {
-    if (localStorage[QUEUE_KEY]) {
-        queue = localStorage[QUEUE_KEY].split(',');
-    }
-    else {
-        queue = [];
-    }
     var new_queue = posts
         .map(post => parse_youtube_id(post.url))
         .filter(id => id !== null)
         .filter(id => localStorage[visited_key(id)] === undefined);
-    queue = queue.concat(new_queue);
 
     let youtube_requests = new_queue
         .filter(videoId => localStorage[title_key(videoId)] === undefined)
@@ -62,9 +53,7 @@ var parse_reddit = function(posts) {
         localStorage[visited_key(videoId)] = 'true';
     });
 
-    localStorage[QUEUE_KEY] = queue.join();
-
-    return Promise.all(youtube_requests);
+    return Promise.all(youtube_requests.concat(queue.extend(new_queue)));
 };
 
 var get_youtube_title = function(videoId) {
@@ -116,34 +105,34 @@ var play_video = function(player_id, video_id) {
 };
 
 const init = function() {
+    update();
+
     let buttonA = document.getElementById('choose_a');
     let buttonB = document.getElementById('choose_b');
-    let results = [];
 
     const compareSongs = function() {
-        let next = queue.pop();
-        localStorage[QUEUE_KEY] = queue.join();
-        binarySearch(results, next, function(a, b) {
-            play_video('player1', a);
-            play_video('player2', b);
-            buttonA.value = localStorage[title_key(a)];
-            buttonB.value = localStorage[title_key(b)];
-            return Promise.race([
-                new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
-                new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
-            ]);
-        }).then(resolution => {
-            let [found, position] = resolution;
-            results.splice(position, 0, next);
-            localStorage[RESULTS_KEY] = results.join();
-            update();
-            compareSongs();
+        Promise.all([results.to_array(), queue.peek()]).then(args => {
+            let [haystack, needle] = args;
+            binarySearch(haystack, needle, function(a, b) {
+                play_video('player1', a);
+                play_video('player2', b);
+                buttonA.value = localStorage[title_key(a)];
+                buttonB.value = localStorage[title_key(b)];
+                return Promise.race([
+                    new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
+                    new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
+                ]);
+            }).then(resolution => {
+                let [found, position] = resolution;
+                results.insert(needle, position).then(() => {
+                    queue.pop().then(() => {
+                        update();
+                        compareSongs();
+                    });
+                });
+            });
         });
-    }
-
-    if (localStorage[RESULTS_KEY]) {
-        results = localStorage[RESULTS_KEY].split(',');
-    }
+    };
 
     fetchPosts('/r/PowerMetal/')
         .then(data => parse_reddit(data.posts))
