@@ -12,8 +12,12 @@ var RESULTS_KEY = '/results';
 var QUEUE_KEY = '/queue';
 var TITLE_KEY_PREFIX = '/title/';
 var VISITED_KEY_PREFIX = '/visited/';
-var title_key = function(id) { return TITLE_KEY_PREFIX + id; };
-var visited_key = function(id) { return VISITED_KEY_PREFIX + id; };
+var title_key = function(id) {
+    return TITLE_KEY_PREFIX + id;
+};
+var visited_key = function(id) {
+    return VISITED_KEY_PREFIX + id;
+};
 
 var update = function() {
     var div = document.getElementById('results');
@@ -22,9 +26,9 @@ var update = function() {
     }
     var ul = document.createElement('ol');
     var results = [];
-	if (localStorage[RESULTS_KEY]) {
-		results = localStorage[RESULTS_KEY].split(',');
-	}
+    if (localStorage[RESULTS_KEY]) {
+        results = localStorage[RESULTS_KEY].split(',');
+    }
     results.slice().reverse().forEach(function(x) {
         var li = document.createElement('li');
         var a = document.createElement('a');
@@ -38,28 +42,29 @@ var update = function() {
 };
 
 var parse_reddit = function(posts) {
-	if (localStorage[QUEUE_KEY]) {
-		queue = localStorage[QUEUE_KEY].split(',');
-	} else {
-		queue = [];
-	}
+    if (localStorage[QUEUE_KEY]) {
+        queue = localStorage[QUEUE_KEY].split(',');
+    }
+    else {
+        queue = [];
+    }
     var new_queue = posts
-                    .map(post => parse_youtube_id(post.url))
-                    .filter(id => id !== null)
-                    .filter(id => localStorage[visited_key(id)] === undefined);
-	queue = queue.concat(new_queue);
+        .map(post => parse_youtube_id(post.url))
+        .filter(id => id !== null)
+        .filter(id => localStorage[visited_key(id)] === undefined);
+    queue = queue.concat(new_queue);
 
-	let youtube_requests = new_queue
-	    .filter(videoId => localStorage[title_key(videoId)] === undefined)
-	    .map(get_youtube_title);
+    let youtube_requests = new_queue
+        .filter(videoId => localStorage[title_key(videoId)] === undefined)
+        .map(get_youtube_title);
 
     new_queue.forEach(function(videoId) {
         localStorage[visited_key(videoId)] = 'true';
     });
 
-	localStorage[QUEUE_KEY] = queue.join();
+    localStorage[QUEUE_KEY] = queue.join();
 
-	return Promise.all(youtube_requests);
+    return Promise.all(youtube_requests);
 };
 
 var get_youtube_title = function(videoId) {
@@ -86,9 +91,10 @@ var get_youtube_title = function(videoId) {
 var parse_youtube_id = function(url) {
     var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var match = url.match(regExp);
-    if (match&&match[2].length==11){
+    if (match && match[2].length == 11) {
         return match[2];
-    } else {
+    }
+    else {
         return null;
     }
 };
@@ -98,13 +104,14 @@ var play_video = function(player_id, video_id) {
         players[player_id] = new YT.Player(player_id, {
             videoId: video_id
         });
-    } else {
-		// Prevent having to restart the video when it's just the same one again anyway.
-		if (video_id !== players_last[player_id]) {
-			var player = players[player_id];
-			player.cueVideoById(video_id);
-			players_last[player_id] = video_id;
-		}
+    }
+    else {
+        // Prevent having to restart the video when it's just the same one again anyway.
+        if (video_id !== players_last[player_id]) {
+            var player = players[player_id];
+            player.cueVideoById(video_id);
+            players_last[player_id] = video_id;
+        }
     };
 };
 
@@ -126,11 +133,11 @@ const init = function() {
                 new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
             ]);
         }).then(resolution => {
-           let [found, position] = resolution;
-           results.splice(position, 0, next);
-           localStorage[RESULTS_KEY] = results.join();
-           update();
-           compareSongs();
+            let [found, position] = resolution;
+            results.splice(position, 0, next);
+            localStorage[RESULTS_KEY] = results.join();
+            update();
+            compareSongs();
         });
     }
 
@@ -139,8 +146,8 @@ const init = function() {
     }
 
     fetchPosts('/r/PowerMetal/')
-    .then(data => parse_reddit(data.posts))
-    .then(compareSongs)
-    .catch(console.error);
+        .then(data => parse_reddit(data.posts))
+        .then(compareSongs)
+        .catch(console.error);
 };
 init();
