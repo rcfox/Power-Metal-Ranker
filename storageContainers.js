@@ -68,3 +68,47 @@ export class Queue extends List {
         });
     }
 }
+
+export class Dictionary {
+    constructor(key) {
+        this._key = key;
+    }
+
+    set(key, value) {
+        return localForage.getItem(this._key).then(dict => {
+            if (dict === null) {
+                dict = {};
+            }
+            dict[key] = value;
+            return localForage.setItem(this._key, dict);
+        });
+    }
+
+    merge(otherDict) {
+        return localForage.getItem(this._key).then(dict => {
+            if (dict === null) {
+                dict = {};
+            }
+            Object.keys(otherDict).forEach(key => dict[key] = otherDict[key]);
+            return localForage.setItem(this._key, dict);
+        });
+    }
+
+    get(key) {
+        return localForage.getItem(this._key).then(dict => {
+            if (dict === null) {
+                dict = {};
+            }
+            return Promise.resolve(dict[key]);
+        });
+    }
+
+    to_object() {
+        return localForage.getItem(this._key).then(dict => {
+            if (dict === null) {
+                dict = {};
+            }
+            return Promise.resolve(dict);
+        });
+    }
+}
