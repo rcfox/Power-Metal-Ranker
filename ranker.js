@@ -6,21 +6,21 @@ const queue = new Queue('queue');
 const results = new List('results');
 const titleStore = new Dictionary('titles');
 
-var players = {};
-var players_last = {};
+const players = {};
+const players_last = {};
 
 const YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
-var update = function() {
-    var div = document.getElementById('results');
+const update = function() {
+    const div = document.getElementById('results');
     if (div.firstChild) {
         div.removeChild(div.firstChild);
     }
-    var ul = document.createElement('ol');
+    const ul = document.createElement('ol');
     results.to_array().then(array => {
         array.reverse().forEach(x => {
-            var li = document.createElement('li');
-            var a = document.createElement('a');
+            const li = document.createElement('li');
+            const a = document.createElement('a');
             a.href = 'https://www.youtube.com/watch?v=' + x;
             a.target = '_blank';
             titleStore.get(x).then(title => a.innerHTML = title);
@@ -31,7 +31,7 @@ var update = function() {
     div.appendChild(ul);
 };
 
-var parse_reddit = function(posts) {
+const parse_reddit = function(posts) {
     return titleStore.to_object().then(titles => {
         let newQueue = posts
             .map(post => parse_youtube_id(post.url))
@@ -52,7 +52,7 @@ var parse_reddit = function(posts) {
     });
 };
 
-var get_youtube_title = function(videoId) {
+const get_youtube_title = function(videoId) {
     let url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id%2Csnippet)&key=${YOUTUBE_API_KEY}`;
     return fetch(url)
         .then(response => response.json())
@@ -61,7 +61,7 @@ var get_youtube_title = function(videoId) {
                 return Promise.reject('An error occurred trying to access the YouTube API: ' + data['error']['message']);
             }
             else {
-                var title = data['items'][0]['snippet']['title'];
+                let title = data['items'][0]['snippet']['title'];
                 return Promise.resolve([videoId, title]);
             }
         });
@@ -69,9 +69,9 @@ var get_youtube_title = function(videoId) {
 
 
 // Stolen from http://stackoverflow.com/a/9102270
-var parse_youtube_id = function(url) {
-    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    var match = url.match(regExp);
+const parse_youtube_id = function(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
     if (match && match[2].length == 11) {
         return match[2];
     }
@@ -80,7 +80,7 @@ var parse_youtube_id = function(url) {
     }
 };
 
-var play_video = function(player_id, video_id) {
+const play_video = function(player_id, video_id) {
     if (!players[player_id]) {
         players[player_id] = new YT.Player(player_id, {
             videoId: video_id
@@ -89,7 +89,7 @@ var play_video = function(player_id, video_id) {
     else {
         // Prevent having to restart the video when it's just the same one again anyway.
         if (video_id !== players_last[player_id]) {
-            var player = players[player_id];
+            let player = players[player_id];
             player.cueVideoById(video_id);
             players_last[player_id] = video_id;
         }
