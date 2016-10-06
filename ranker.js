@@ -59,8 +59,7 @@ const get_youtube_title = function(videoId) {
         .then(data => {
             if (data['error']) {
                 return Promise.reject('An error occurred trying to access the YouTube API: ' + data['error']['message']);
-            }
-            else {
+            } else {
                 let title = data['items'][0]['snippet']['title'];
                 return Promise.resolve([videoId, title]);
             }
@@ -74,8 +73,7 @@ const parse_youtube_id = function(url) {
     const match = url.match(regExp);
     if (match && match[2].length == 11) {
         return match[2];
-    }
-    else {
+    } else {
         return null;
     }
 };
@@ -85,8 +83,7 @@ const play_video = function(player_id, video_id) {
         players[player_id] = new YT.Player(player_id, {
             videoId: video_id
         });
-    }
-    else {
+    } else {
         // Prevent having to restart the video when it's just the same one again anyway.
         if (video_id !== players_last[player_id]) {
             let player = players[player_id];
