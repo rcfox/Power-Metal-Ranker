@@ -12,12 +12,8 @@ const players = {};
 const YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
 function update() {
-    const div = document.getElementById('results');
-    if (div.firstChild) {
-        div.removeChild(div.firstChild);
-    }
-    const ul = document.createElement('ol');
     results.toArray().then(array => {
+        const ul = document.createElement('ol');
         array.reverse().forEach(x => {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -27,8 +23,16 @@ function update() {
             li.appendChild(a);
             ul.appendChild(li);
         });
-    });
-    div.appendChild(ul);
+        return Promise.resolve(ul);
+    }).then(ul => {
+        const div = document.getElementById('results');
+        if (div.firstChild) {
+            div.removeChild(div.firstChild);
+        }
+        div.appendChild(ul);
+        return Promise.resolve(div);
+    })
+    .catch(console.error);
 }
 
 function parseReddit(posts) {
