@@ -9,7 +9,7 @@ const titleStore = new Dictionary('titles');
 const players = {};
 const YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
-const update = function() {
+function update() {
     const div = document.getElementById('results');
     if (div.firstChild) {
         div.removeChild(div.firstChild);
@@ -27,9 +27,9 @@ const update = function() {
         });
     });
     div.appendChild(ul);
-};
+}
 
-const parseReddit = function(posts) {
+function parseReddit(posts) {
     return titleStore.toObject().then(titles => {
         let newQueue = posts
             .map(post => parseYouTubeID(post.url))
@@ -48,9 +48,9 @@ const parseReddit = function(posts) {
 
         return Promise.all([titleStoreUpdate, queue.extend(newQueue)]);
     });
-};
+}
 
-const getYouTubeTitle = function(videoId) {
+function getYouTubeTitle(videoId) {
     let url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id%2Csnippet)&key=${YOUTUBE_API_KEY}`;
     /* global fetch */
     return fetch(url)
@@ -63,11 +63,11 @@ const getYouTubeTitle = function(videoId) {
                 return Promise.resolve([videoId, title]);
             }
         });
-};
+}
 
 
 // Stolen from http://stackoverflow.com/a/9102270
-const parseYouTubeID = function(url) {
+function parseYouTubeID(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     if (match && match[2].length == 11) {
@@ -75,9 +75,9 @@ const parseYouTubeID = function(url) {
     } else {
         return null;
     }
-};
+}
 
-const playVideo = function(playerID, videoID) {
+function playVideo(playerID, videoID) {
     return new Promise((resolve, reject) => {
         let player = players[playerID];
         if (player === undefined) {
@@ -97,9 +97,9 @@ const playVideo = function(playerID, videoID) {
             resolve(player);
         }
     });
-};
+}
 
-const compareSongs = function() {
+function compareSongs() {
     let buttonA = document.getElementById('chooseA');
     let buttonB = document.getElementById('chooseB');
 
@@ -125,9 +125,9 @@ const compareSongs = function() {
             });
         });
     });
-};
+}
 
-const init = function() {
+function init() {
     let clearButton = document.getElementById('clearResults');
     clearButton.addEventListener('click', event => {
         if (window.confirm('Are you sure you want to clear your rankings?')) {
@@ -145,5 +145,5 @@ const init = function() {
         .then(data => parseReddit(data.posts))
         .then(compareSongs)
         .catch(console.error);
-};
+}
 init();
