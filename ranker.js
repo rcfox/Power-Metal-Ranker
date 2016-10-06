@@ -105,26 +105,43 @@ function compareSongs() {
 
     return Promise.all([results.toArray(), queue.peek(), titleStore.toObject()]).then(args => {
         let [haystack, needle, titles] = args;
-        binarySearch(haystack, needle, function(a, b) {
-        return Promise.all([playVideo('player1', a), playVideo('player2', b)])
-            .then(players => {
-                buttonA.value = titles[a];
-                buttonB.value = titles[b];
-                return Promise.race([
-                    new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
-                    new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
-                ]);
-            });
+
+        if (needle === undefined) {
+            return Promise.resolve('done');
+        }
+
+        return binarySearch(haystack, needle, function(a, b) {
+            return Promise.all([playVideo('player1', a), playVideo('player2', b)])
+                .then(players => {
+                    buttonA.value = titles[a];
+                    buttonB.value = titles[b];
+                    return Promise.race([
+                        new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
+                        new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
+                    ]);
+                });
         }).then(resolution => {
             let [, position] = resolution;
-            results.insert(needle, position).then(() => {
-                queue.pop().then(() => {
+            return results.insert(needle, position).then(() => {
+                return queue.pop().then(() => {
                     update();
                     return compareSongs();
                 });
             });
         });
     });
+}
+
+function finished() {
+    Object.keys(players).forEach(playerID => {
+        players[playerID].destroy();
+    });
+
+    let choicesDiv = document.getElementById('choices');
+    choicesDiv.style.display = 'none';
+
+    let doneDiv = document.getElementById('done');
+    doneDiv.style.display = 'block';
 }
 
 function init() {
@@ -144,6 +161,7 @@ function init() {
     fetchPosts('/r/PowerMetal/')
         .then(data => parseReddit(data.posts))
         .then(compareSongs)
+        .then(finished)
         .catch(console.error);
 }
 init();
