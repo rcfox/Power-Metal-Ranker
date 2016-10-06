@@ -44,7 +44,7 @@ const parse_reddit = function(posts) {
                 aggregator[id] = title;
             });
             return titleStore.merge(aggregator);
-        })
+        });
 
         return Promise.all([titleStoreUpdate, queue.extend(newQueue)]);
     });
@@ -52,6 +52,7 @@ const parse_reddit = function(posts) {
 
 const get_youtube_title = function(videoId) {
     let url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id%2Csnippet)&key=${YOUTUBE_API_KEY}`;
+    /* global fetch */
     return fetch(url)
         .then(response => response.json())
         .then(data => {
