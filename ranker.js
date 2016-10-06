@@ -128,6 +128,17 @@ const compareSongs = function() {
 };
 
 const init = function() {
+    let clearButton = document.getElementById('clearResults');
+    clearButton.addEventListener('click', event => {
+        if (window.confirm('Are you sure you want to clear your rankings?')) {
+            results.toArray()
+                .then(array => queue.extend(array))
+                .then(() => results.clear())
+                .then(() => window.location.reload())
+                .catch(console.error);
+        }
+    });
+
     update();
 
     fetchPosts('/r/PowerMetal/')

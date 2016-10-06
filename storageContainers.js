@@ -34,6 +34,10 @@ export class List {
         });
     }
 
+    clear() {
+        return localForage.removeItem(this._key);
+    }
+
     toArray() {
         return localForage.getItem(this._key).then(list => {
             if (list === null) {
