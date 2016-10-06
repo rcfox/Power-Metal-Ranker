@@ -7,8 +7,6 @@ const results = new List('results');
 const titleStore = new Dictionary('titles');
 
 const players = {};
-const players_last = {};
-
 const YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
 const update = function() {
@@ -79,18 +77,25 @@ const parse_youtube_id = function(url) {
 };
 
 const play_video = function(player_id, video_id) {
-    if (!players[player_id]) {
-        players[player_id] = new YT.Player(player_id, {
-            videoId: video_id
-        });
-    } else {
-        // Prevent having to restart the video when it's just the same one again anyway.
-        if (video_id !== players_last[player_id]) {
-            let player = players[player_id];
-            player.cueVideoById(video_id);
-            players_last[player_id] = video_id;
+    return new Promise((resolve, reject) => {
+        let player = players[player_id];
+        if (player === undefined) {
+            /* global YT */
+            players[player_id] = new YT.Player(player_id, {
+                videoId: video_id,
+                events: {
+                    onReady: event => resolve(event.target),
+                    onError: event => reject('YouTube error: ' + event.data)
+                }
+            });
+        } else {
+            // Prevent having to restart the video when it's just the same one again anyway.
+            if (video_id !== player.getVideoData().video_id) {
+                player.cueVideoById(video_id);
+            }
+            resolve(player);
         }
-    };
+    });
 };
 
 const compareSongs = function() {
@@ -100,14 +105,15 @@ const compareSongs = function() {
     return Promise.all([results.to_array(), queue.peek(), titleStore.to_object()]).then(args => {
         let [haystack, needle, titles] = args;
         binarySearch(haystack, needle, function(a, b) {
-            play_video('player1', a);
-            play_video('player2', b);
-            buttonA.value = titles[a];
-            buttonB.value = titles[b];
-            return Promise.race([
-                new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
-                new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
-            ]);
+        return Promise.all([play_video('player1', a), play_video('player2', b)])
+            .then(players => {
+                buttonA.value = titles[a];
+                buttonB.value = titles[b];
+                return Promise.race([
+                    new Promise((resolve, reject) => buttonA.onclick = e => resolve(1)),
+                    new Promise((resolve, reject) => buttonB.onclick = e => resolve(-1))
+                ]);
+            });
         }).then(resolution => {
             let [, position] = resolution;
             results.insert(needle, position).then(() => {
