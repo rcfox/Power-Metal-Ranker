@@ -3,14 +3,14 @@ iframe.youtube {
 	width: 100%;
 }
 
-div.video_option {
+div.videoOption {
 	width: 30%;
 	float: left;
 	margin-left: 1em;
 	margin-right: 1em;
 }
 
-div.video_option input {
+div.videoOption input {
 	width: 100%;
 	height: 10ex;
 }
@@ -27,7 +27,7 @@ div#results {
 	float: right;
 }
 
-input#clear_results {
+input#clearResults {
 	position: absolute;
 	top: 0;
 	right: 0;

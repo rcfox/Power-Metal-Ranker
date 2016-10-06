@@ -15,7 +15,7 @@ const update = function() {
         div.removeChild(div.firstChild);
     }
     const ul = document.createElement('ol');
-    results.to_array().then(array => {
+    results.toArray().then(array => {
         array.reverse().forEach(x => {
             const li = document.createElement('li');
             const a = document.createElement('a');
@@ -29,14 +29,14 @@ const update = function() {
     div.appendChild(ul);
 };
 
-const parse_reddit = function(posts) {
-    return titleStore.to_object().then(titles => {
+const parseReddit = function(posts) {
+    return titleStore.toObject().then(titles => {
         let newQueue = posts
-            .map(post => parse_youtube_id(post.url))
+            .map(post => parseYouTubeID(post.url))
             .filter(id => id !== null)
             .filter(id => titles[id] === undefined);
 
-        let youtubeRequests = newQueue.map(get_youtube_title);
+        let youtubeRequests = newQueue.map(getYouTubeTitle);
         let titleStoreUpdate = Promise.all(youtubeRequests).then(idTitles => {
             let aggregator = {};
             idTitles.forEach(idTitle => {
@@ -50,7 +50,7 @@ const parse_reddit = function(posts) {
     });
 };
 
-const get_youtube_title = function(videoId) {
+const getYouTubeTitle = function(videoId) {
     let url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&fields=items(id%2Csnippet)&key=${YOUTUBE_API_KEY}`;
     /* global fetch */
     return fetch(url)
@@ -67,7 +67,7 @@ const get_youtube_title = function(videoId) {
 
 
 // Stolen from http://stackoverflow.com/a/9102270
-const parse_youtube_id = function(url) {
+const parseYouTubeID = function(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     if (match && match[2].length == 11) {
@@ -77,13 +77,13 @@ const parse_youtube_id = function(url) {
     }
 };
 
-const play_video = function(player_id, video_id) {
+const playVideo = function(playerID, videoID) {
     return new Promise((resolve, reject) => {
-        let player = players[player_id];
+        let player = players[playerID];
         if (player === undefined) {
             /* global YT */
-            players[player_id] = new YT.Player(player_id, {
-                videoId: video_id,
+            players[playerID] = new YT.Player(playerID, {
+                videoId: videoID,
                 events: {
                     onReady: event => resolve(event.target),
                     onError: event => reject('YouTube error: ' + event.data)
@@ -91,8 +91,8 @@ const play_video = function(player_id, video_id) {
             });
         } else {
             // Prevent having to restart the video when it's just the same one again anyway.
-            if (video_id !== player.getVideoData().video_id) {
-                player.cueVideoById(video_id);
+            if (videoID !== player.getVideoData().videoID) {
+                player.cueVideoById(videoID);
             }
             resolve(player);
         }
@@ -100,13 +100,13 @@ const play_video = function(player_id, video_id) {
 };
 
 const compareSongs = function() {
-    let buttonA = document.getElementById('choose_a');
-    let buttonB = document.getElementById('choose_b');
+    let buttonA = document.getElementById('chooseA');
+    let buttonB = document.getElementById('chooseB');
 
-    return Promise.all([results.to_array(), queue.peek(), titleStore.to_object()]).then(args => {
+    return Promise.all([results.toArray(), queue.peek(), titleStore.toObject()]).then(args => {
         let [haystack, needle, titles] = args;
         binarySearch(haystack, needle, function(a, b) {
-        return Promise.all([play_video('player1', a), play_video('player2', b)])
+        return Promise.all([playVideo('player1', a), playVideo('player2', b)])
             .then(players => {
                 buttonA.value = titles[a];
                 buttonB.value = titles[b];
@@ -131,7 +131,7 @@ const init = function() {
     update();
 
     fetchPosts('/r/PowerMetal/')
-        .then(data => parse_reddit(data.posts))
+        .then(data => parseReddit(data.posts))
         .then(compareSongs)
         .catch(console.error);
 };

@@ -15,12 +15,12 @@ export class List {
         });
     }
 
-    extend(extend_list) {
+    extend(extendList) {
         return localForage.getItem(this._key).then(list => {
             if (list === null) {
                 list = [];
             }
-            return localForage.setItem(this._key, list.concat(extend_list));
+            return localForage.setItem(this._key, list.concat(extendList));
         });
     }
 
@@ -34,7 +34,7 @@ export class List {
         });
     }
 
-    to_array() {
+    toArray() {
         return localForage.getItem(this._key).then(list => {
             if (list === null) {
                 list = [];
@@ -103,7 +103,7 @@ export class Dictionary {
         });
     }
 
-    to_object() {
+    toObject() {
         return localForage.getItem(this._key).then(dict => {
             if (dict === null) {
                 dict = {};
