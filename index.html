@@ -1,41 +1,41 @@
 <!DOCTYPE html>
 <html>
   <head>
-	<link href="style.css" rel="stylesheet" type="text/css">
-	<script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
-	<script type="text/javascript" src="ranker.js"></script>
-	<script type="text/javascript" src="https://www.reddit.com/r/powermetal/.json?jsonp=parse_reddit&amp;limit=100"></script>
-	<title>Power Metal Ranker</title>
+  <link href="style.css" rel="stylesheet" type="text/css">
+  <script type="text/javascript" src="https://www.youtube.com/iframe_api"></script>
+  <title>Power Metal Ranker</title>
   </head>
-  <body onload="update()">
-	<h1>Which is better?</h1>
-	
-	<div id="results"></div>
+  <body>
+  <h1>Which is better?</h1>
 
-	<p><span id="comparison_counter">x</span> more comparisons until the next song.</p>
+  <div id="results"></div>
 
-	<div class="video_option">
-	  <div id="player1" class="youtube"></div>
-	  <input type="button" id="choose_a" onclick="choose_a()" value="Choice A" />
-	</div>
+  <div id="choices">
+    <div class="videoOption">
+      <div id="player1" class="youtube"></div>
+      <input type="button" id="chooseA" value="Choice A" />
+    </div>
 
-	<div class="video_option">
-	  <div id="player2" class="youtube"></div>
-	  <input type="button" id="choose_b" onclick="choose_b()" value="Choice B" />
-	</div>
+    <div class="videoOption">
+      <div id="player2" class="youtube"></div>
+      <input type="button" id="chooseB" value="Choice B" />
+    </div>
+  </div>
 
-	<div id="done">
-	  <h2>You're done!</h2>
-	  <p>There are no more videos left to compare. Check back again later.</p>
-	</div>
+  <div id="done">
+    <h2>You're done!</h2>
+    <p>There are no more videos left to compare. Check back again later.</p>
+  </div>
 
-	<p class="info">
-	  All links are pulled from <a target="_blank" href="http://www.reddit.com/r/PowerMetal">/r/PowerMetal</a> on Reddit.
-	</p>
-	
-	<input type="button" id="clear_results" value="Clear Results" onclick="clear_results()" />
-	
-	<script type="text/javascript">
+  <p class="info">
+    All links are pulled from <a target="_blank" href="http://www.reddit.com/r/PowerMetal">/r/PowerMetal</a> on Reddit.
+  </p>
+
+  <input type="button" id="clearResults" value="Clear Results"/>
+
+  <script type="text/javascript" src="ranker.bundle.js"></script>
+
+  <script type="text/javascript">
   var _gaq = _gaq || [];
   _gaq.push(['_setAccount', 'UA-7020286-2']);
   _gaq.push(['_trackPageview']);
@@ -45,6 +45,6 @@
     ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
     var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
   })();
-</script>
+  </script>
   </body>
 </html>
