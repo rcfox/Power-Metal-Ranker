@@ -1,3 +1,5 @@
+const webpack = require("webpack");
+
 module.exports = {
     entry: './ranker.js',
     output: {
@@ -10,5 +12,9 @@ module.exports = {
             exclude: /node_modules/,
             loader: 'babel-loader'
         }]
-    }
+    },
+    devtool: 'source-map',
+    plugins: [
+        new webpack.optimize.UglifyJsPlugin({minimize: true})
+    ]
 };
