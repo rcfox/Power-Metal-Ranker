@@ -6,6 +6,8 @@ const queue = new Queue('queue');
 const results = new List('results');
 const titleStore = new Dictionary('titles');
 
+import EventEmitter from 'events';
+
 const players = {};
 const YOUTUBE_API_KEY = 'AIzaSyD-YLstteQd9Hpgoo46p--xAvYWzXiM9oU';
 
@@ -77,24 +79,62 @@ function parseYouTubeID(url) {
     }
 }
 
+// YouTube's API is terrible: they haven't properly implemented removeEventListener!
+// This is adapted from: https://code.google.com/p/gdata-issues/issues/detail?id=6700#c10
+function fixYouTubePlayerEventListener(player) {
+    const delegateController = new EventEmitter();
+    const eventTypes = ['onReady', 'onStateChange', 'onError', 'onPlaybackQualityChange',
+                        'onPlaybackRateChange', 'onApiChange'];
+    eventTypes.forEach(eventType => {
+        player.addEventListener(eventType, (...args) => delegateController.emit(eventType, ...args));
+    });
+
+    player.addEventListener = (name, fn) => {
+        delegateController.on(name, fn);
+    };
+
+    player.removeEventListener = (name, fn) => {
+        delegateController.removeListener(name, fn);
+    };
+}
+
 function playVideo(playerID, videoID) {
     return new Promise((resolve, reject) => {
         let player = players[playerID];
         if (player === undefined) {
             /* global YT */
-            players[playerID] = new YT.Player(playerID, {
+            player = new YT.Player(playerID, {
                 videoId: videoID,
                 events: {
-                    onReady: event => resolve(event.target),
-                    onError: event => reject('YouTube error: ' + event.data)
+                    onReady: (event) => resolve(event.target),
+                    onError: (event) => reject('YouTube error: ' + event.data)
                 }
             });
+            fixYouTubePlayerEventListener(player);
+            players[playerID] = player;
         } else {
             // Prevent having to restart the video when it's just the same one again anyway.
-            if (videoID !== player.getVideoData().videoID) {
+            if (videoID === player.getVideoData().video_id) {
+                resolve(player);
+            } else {
+                const onStateChange = (event) => {
+                    if (event.data === YT.PlayerState.CUED) {
+                        player.removeEventListener('onStateChange', onStateChange);
+                        player.removeEventListener('onError', onError);
+                        resolve(event.target);
+                    }
+                };
+
+                const onError = (event) => {
+                    player.removeEventListener('onStateChange', onStateChange);
+                    player.removeEventListener('onError', onError);
+                    reject('YouTube error: ' + event.data);
+                };
+
+                player.addEventListener('onStateChange', onStateChange);
+                player.addEventListener('onError', onError);
                 player.cueVideoById(videoID);
             }
-            resolve(player);
         }
     });
 }
